@@ -1,0 +1,27 @@
+{
+    "name": "pream-renderer",
+    "version": "1.0.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/lgooday/pream-renderer.git"
+    },
+    "scripts": {
+        "build": "tsc -p src"
+    },
+    "dependencies": {
+        "fs-extra": "^8.1.0",
+        "glob": "^5.0.14",
+        "less": "^3.11.1",
+        "pug": "^2.0.3"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^8.0.1",
+        "@types/less": "^3.0.1",
+        "@types/node": "^8.0.9",
+        "@types/pug": "^2.0.4",
+        "ts-node": "^6.0.3",
+        "tslint": "^5.18.0",
+        "typescript": "^3.7.5"
+    },
+    "main": "./dist/main.js"
+}
