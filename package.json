@@ -6,7 +6,7 @@
         "url": "git+https://github.com/lgooday/pream-renderer.git"
     },
     "scripts": {
-        "build": "tsc -p src"
+        "build": "tsc -p src --declaration"
     },
     "dependencies": {
         "fs-extra": "^8.1.0",
@@ -23,6 +23,5 @@
         "tslint": "^5.18.0",
         "typescript": "^3.7.5"
     },
-    "main": "./dist/main.js",
-    "typings": "./src/typings/index.d.ts"
+    "main": "./dist/main.js"
 }
