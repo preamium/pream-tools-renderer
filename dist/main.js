@@ -46,11 +46,11 @@ var PreamRenderer = /** @class */ (function () {
         this.stuffFilename = stuffFilename;
         this.template = pug.compileFile(path.join(stuffPath, stuffFilename + ".pug"));
     }
-    PreamRenderer.prototype.renderDom = function (content) {
-        this.dom = this.template({ content: content });
+    PreamRenderer.prototype.renderDom = function (input) {
+        this.dom = this.template({ content: input.content });
         return Promise.resolve();
     };
-    PreamRenderer.prototype.renderStyle = function (content) {
+    PreamRenderer.prototype.renderStyle = function (input) {
         return __awaiter(this, void 0, void 0, function () {
             var style, _a;
             return __generator(this, function (_b) {
@@ -67,11 +67,15 @@ var PreamRenderer = /** @class */ (function () {
             });
         });
     };
-    PreamRenderer.prototype.process = function (content) {
+    PreamRenderer.prototype.renderHeader = function (input) {
+        this.header = input.header;
+        return Promise.resolve();
+    };
+    PreamRenderer.prototype.process = function (input) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, Promise.all([this.renderDom(content), this.renderStyle(content)])];
+                    case 0: return [4 /*yield*/, Promise.all([this.renderDom(input), this.renderStyle(input), this.renderHeader(input)])];
                     case 1:
                         _a.sent();
                         return [2 /*return*/, Promise.resolve()];
@@ -83,6 +87,7 @@ var PreamRenderer = /** @class */ (function () {
         return {
             style: this.style,
             dom: this.dom,
+            header: this.header,
         };
     };
     return PreamRenderer;
