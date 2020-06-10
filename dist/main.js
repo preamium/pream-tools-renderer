@@ -47,15 +47,22 @@ var PreamRenderer = /** @class */ (function () {
         this.template = pug.compileFile(path.join(stuffPath, stuffFilename + ".pug"));
     }
     PreamRenderer.prototype.renderDom = function (input) {
-        this.dom = this.template({ content: input.content });
-        return Promise.resolve();
+        try {
+            this.dom = this.template({ content: input.content });
+            return Promise.resolve();
+        }
+        catch (e) {
+            return Promise.reject(new Error(e));
+        }
     };
     PreamRenderer.prototype.renderStyle = function (input) {
         return __awaiter(this, void 0, void 0, function () {
-            var style, _a;
+            var style, _a, e_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0: return [4 /*yield*/, fs.readFile(path.join(this.stuffPath, this.stuffFilename + ".less"), 'utf-8')];
+                    case 0:
+                        _b.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, fs.readFile(path.join(this.stuffPath, this.stuffFilename + ".less"), 'utf-8')];
                     case 1:
                         style = _b.sent();
                         _a = this;
@@ -63,23 +70,21 @@ var PreamRenderer = /** @class */ (function () {
                     case 2:
                         _a.style = (_b.sent()).css;
                         return [2 /*return*/, Promise.resolve()];
+                    case 3:
+                        e_1 = _b.sent();
+                        return [2 /*return*/, Promise.reject(new Error(e_1))];
+                    case 4: return [2 /*return*/];
                 }
             });
         });
     };
     PreamRenderer.prototype.renderHeader = function (input) {
         this.header = input.header;
-        return Promise.resolve();
     };
     PreamRenderer.prototype.process = function (input) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, Promise.all([this.renderDom(input), this.renderStyle(input), this.renderHeader(input)])];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/, Promise.resolve()];
-                }
+                return [2 /*return*/, Promise.race([this.renderDom(input), this.renderStyle(input), this.renderHeader(input)])];
             });
         });
     };

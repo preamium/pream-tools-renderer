@@ -1,4 +1,4 @@
-import { IRenderInput, IRenderOutput } from './interfaces/io';
+import { IRenderInput, IRenderOutput } from 'pream-types';
 export default class PreamRenderer {
     private template;
     private style;
