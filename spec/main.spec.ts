@@ -10,7 +10,7 @@ describe('main.ts', function () {
             content: 'content',
             header: 'header',
             iconClass: 'iconClass',
-        }
+        } as IRenderInput
         await r.process(input)
 
         const expected: IRenderOutput = {
