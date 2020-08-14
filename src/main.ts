@@ -1,7 +1,7 @@
 import * as pug from 'pug'
 import * as less from 'less'
 import * as path from 'path'
-import * as fs from 'fs-extra'
+import * as fs from 'fs'
 import { IRenderInput, IRenderOutput } from 'pream-types'
 
 export default class PreamRenderer {
@@ -15,9 +15,15 @@ export default class PreamRenderer {
     private stuffFilename: string
 
     constructor(stuffPath: string, stuffFilename: string) {
-        this.stuffPath = stuffPath
-        this.stuffFilename = stuffFilename
-        this.template = pug.compileFile(path.join(stuffPath, `${stuffFilename}.pug`))
+        const fullPath: string = path.join(stuffPath, stuffFilename)
+
+        if (fs.existsSync(`${fullPath}.pug`)) {
+            this.stuffPath = stuffPath
+            this.stuffFilename = stuffFilename
+            this.template = pug.compileFile(`${fullPath}.pug`)
+        } else {
+            throw new Error(`path/file not found`)
+        }
     }
 
     private renderDom(input: IRenderInput): Promise<void> {
@@ -31,8 +37,9 @@ export default class PreamRenderer {
 
     private async renderStyle(input: IRenderInput): Promise<void> {
         try {
-            const style = await fs.readFile(path.join(this.stuffPath, `${this.stuffFilename}.less`), 'utf-8')
-            this.style = (await less.render(style)).css
+            const lessFile: string = fs.readFileSync(path.join(this.stuffPath, `${this.stuffFilename}.less`), 'utf-8')
+            const style: Less.RenderOutput = await less.render(lessFile, { compress: true })
+            this.style = style.css
             return Promise.resolve()
         } catch (e) {
             return Promise.reject(new Error(e))
