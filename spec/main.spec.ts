@@ -4,13 +4,14 @@ import Renderer from '../src/main'
 import { IRenderInput, IRenderOutput } from 'pream-types'
 
 describe('main.ts', function () {
-    it('should render', async function () {
+    it('should render', async () => {
         const r: Renderer = new Renderer(path.join(__dirname, 'stuff'), 'stuff')
         const input: IRenderInput = {
             content: 'content',
             header: 'header',
             iconClass: 'iconClass',
         } as IRenderInput
+
         await r.process(input)
 
         const expected: IRenderOutput = {
@@ -24,9 +25,9 @@ describe('main.ts', function () {
         expect(output).to.eql(expected)
     })
 
-    it('should not construct', function () {
+    it('should not construct', () => {
         // tslint:disable-next-line: no-unused-expression
-        let fcn = function () { new Renderer('not', 'exists') };
-        expect(fcn).to.throw(Error, 'path/file not found');
+        let fcn = function () { new Renderer('not', 'exists') }
+        expect(fcn).to.throw(Error, 'path/file not found')
     })
 })
