@@ -39,12 +39,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var pug = require("pug");
 var less = require("less");
 var path = require("path");
-var fs = require("fs-extra");
+var fs = require("fs");
 var PreamRenderer = /** @class */ (function () {
     function PreamRenderer(stuffPath, stuffFilename) {
-        this.stuffPath = stuffPath;
-        this.stuffFilename = stuffFilename;
-        this.template = pug.compileFile(path.join(stuffPath, stuffFilename + ".pug"));
+        var fullPath = path.join(stuffPath, stuffFilename);
+        if (fs.existsSync(fullPath + ".pug")) {
+            this.stuffPath = stuffPath;
+            this.stuffFilename = stuffFilename;
+            this.template = pug.compileFile(fullPath + ".pug");
+        }
+        else {
+            throw new Error("path/file not found");
+        }
     }
     PreamRenderer.prototype.renderDom = function (input) {
         try {
@@ -57,23 +63,21 @@ var PreamRenderer = /** @class */ (function () {
     };
     PreamRenderer.prototype.renderStyle = function (input) {
         return __awaiter(this, void 0, void 0, function () {
-            var style, _a, e_1;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var lessFile, style, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
-                        _b.trys.push([0, 3, , 4]);
-                        return [4 /*yield*/, fs.readFile(path.join(this.stuffPath, this.stuffFilename + ".less"), 'utf-8')];
+                        _a.trys.push([0, 2, , 3]);
+                        lessFile = fs.readFileSync(path.join(this.stuffPath, this.stuffFilename + ".less"), 'utf-8');
+                        return [4 /*yield*/, less.render(lessFile, { compress: true })];
                     case 1:
-                        style = _b.sent();
-                        _a = this;
-                        return [4 /*yield*/, less.render(style)];
-                    case 2:
-                        _a.style = (_b.sent()).css;
+                        style = _a.sent();
+                        this.style = style.css;
                         return [2 /*return*/, Promise.resolve()];
-                    case 3:
-                        e_1 = _b.sent();
+                    case 2:
+                        e_1 = _a.sent();
                         return [2 /*return*/, Promise.reject(new Error(e_1))];
-                    case 4: return [2 /*return*/];
+                    case 3: return [2 /*return*/];
                 }
             });
         });

@@ -14,7 +14,7 @@
         "fs-extra": "^8.1.0",
         "glob": "^5.0.14",
         "less": "^3.11.1",
-        "pream-types": "^1.3.0",
+        "pream-types": "^2.1.0",
         "pug": "^2.0.3"
     },
     "devDependencies": {
