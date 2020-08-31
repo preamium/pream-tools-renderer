@@ -14,7 +14,6 @@
         "fs-extra": "^8.1.0",
         "glob": "^5.0.14",
         "less": "^3.11.1",
-        "pream-types": "^2.1.0",
         "pug": "^2.0.3"
     },
     "devDependencies": {
@@ -26,6 +25,7 @@
         "@types/pug": "^2.0.4",
         "chai": "^4.2.0",
         "mocha": "^8.1.1",
+        "pream-types": "^2.7.0",
         "rimraf": "^3.0.2",
         "ts-node": "^6.0.3",
         "tslint": "^5.18.0",
