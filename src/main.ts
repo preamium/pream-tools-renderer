@@ -11,19 +11,32 @@ export default class PreamRenderer {
     private style: string
     private header: string
     private dom: string
-    private stuffPath: string
-    private stuffFilename: string
+    private lessContent: string
 
-    constructor(stuffPath: string, stuffFilename: string) {
-        const fullPath: string = path.join(stuffPath, stuffFilename)
-
-        if (fs.existsSync(`${fullPath}.pug`)) {
-            this.stuffPath = stuffPath
-            this.stuffFilename = stuffFilename
-            this.template = pug.compileFile(`${fullPath}.pug`)
+    constructor(stuffPath: string, stuffFilename: string, inlineTemplate?: string, inlineStyle?: string) {
+        if (!inlineTemplate) {
+            const fullPath: string = path.join(stuffPath, stuffFilename)
+            if (fs.existsSync(`${fullPath}.pug`)) {
+                this.template = pug.compileFile(`${fullPath}.pug`)
+            } else {
+                throw new Error('one or many stuff file not found')
+            }
         } else {
-            throw new Error(`path/file not found`)
+            this.template = pug.compile(inlineTemplate)
         }
+
+        if (!inlineTemplate) {
+            const fullPath: string = path.join(stuffPath, stuffFilename)
+            if (fs.existsSync(`${fullPath}.less`)) {
+                this.lessContent = fs.readFileSync(`${fullPath}.less`, 'utf-8')
+            } else {
+                throw new Error('one or many stuff file not found')
+            }
+        } else {
+            this.lessContent = inlineStyle
+        }
+
+
     }
 
     private renderDom(input: IRenderInput): Promise<void> {
@@ -37,8 +50,7 @@ export default class PreamRenderer {
 
     private async renderStyle(input: IRenderInput): Promise<void> {
         try {
-            const lessFile: string = fs.readFileSync(path.join(this.stuffPath, `${this.stuffFilename}.less`), 'utf-8')
-            const style: Less.RenderOutput = await less.render(lessFile, { compress: true })
+            const style: Less.RenderOutput = await less.render(this.lessContent, { compress: true })
             this.style = style.css
             return Promise.resolve()
         } catch (e) {
