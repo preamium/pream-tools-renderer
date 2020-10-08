@@ -38,19 +38,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var pug = require("pug");
 var less = require("less");
-var path = require("path");
-var fs = require("fs");
 var PreamRenderer = /** @class */ (function () {
-    function PreamRenderer(stuffPath, stuffFilename) {
-        var fullPath = path.join(stuffPath, stuffFilename);
-        if (fs.existsSync(fullPath + ".pug")) {
-            this.stuffPath = stuffPath;
-            this.stuffFilename = stuffFilename;
-            this.template = pug.compileFile(fullPath + ".pug");
-        }
-        else {
-            throw new Error("path/file not found");
-        }
+    function PreamRenderer(inlineTemplate, inlineStyle) {
+        this.template = pug.compile(inlineTemplate);
+        this.lessContent = inlineStyle;
     }
     PreamRenderer.prototype.renderDom = function (input) {
         try {
@@ -61,15 +52,14 @@ var PreamRenderer = /** @class */ (function () {
             return Promise.reject(new Error(e));
         }
     };
-    PreamRenderer.prototype.renderStyle = function (input) {
+    PreamRenderer.prototype.renderStyle = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var lessFile, style, e_1;
+            var style, e_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        lessFile = fs.readFileSync(path.join(this.stuffPath, this.stuffFilename + ".less"), 'utf-8');
-                        return [4 /*yield*/, less.render(lessFile, { compress: true })];
+                        return [4 /*yield*/, less.render(this.lessContent, { compress: true })];
                     case 1:
                         style = _a.sent();
                         this.style = style.css;
@@ -82,13 +72,10 @@ var PreamRenderer = /** @class */ (function () {
             });
         });
     };
-    PreamRenderer.prototype.renderHeader = function (input) {
-        this.header = input.header;
-    };
     PreamRenderer.prototype.process = function (input) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, Promise.race([this.renderDom(input), this.renderStyle(input), this.renderHeader(input)])];
+                return [2 /*return*/, Promise.race([this.renderDom(input), this.renderStyle()])];
             });
         });
     };
@@ -96,7 +83,6 @@ var PreamRenderer = /** @class */ (function () {
         return {
             style: this.style,
             dom: this.dom,
-            header: this.header,
         };
     };
     return PreamRenderer;

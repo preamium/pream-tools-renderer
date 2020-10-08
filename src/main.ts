@@ -1,7 +1,5 @@
 import * as pug from 'pug'
 import * as less from 'less'
-import * as path from 'path'
-import * as fs from 'fs'
 import { IRenderInput, IRenderOutput } from 'pream-types'
 
 export default class PreamRenderer {
@@ -9,34 +7,12 @@ export default class PreamRenderer {
     private template: pug.compileTemplate
 
     private style: string
-    private header: string
     private dom: string
     private lessContent: string
 
-    constructor(stuffPath: string, stuffFilename: string, inlineTemplate?: string, inlineStyle?: string) {
-        if (!inlineTemplate) {
-            const fullPath: string = path.join(stuffPath, stuffFilename)
-            if (fs.existsSync(`${fullPath}.pug`)) {
-                this.template = pug.compileFile(`${fullPath}.pug`)
-            } else {
-                throw new Error('one or many stuff file not found')
-            }
-        } else {
-            this.template = pug.compile(inlineTemplate)
-        }
-
-        if (!inlineTemplate) {
-            const fullPath: string = path.join(stuffPath, stuffFilename)
-            if (fs.existsSync(`${fullPath}.less`)) {
-                this.lessContent = fs.readFileSync(`${fullPath}.less`, 'utf-8')
-            } else {
-                throw new Error('one or many stuff file not found')
-            }
-        } else {
-            this.lessContent = inlineStyle
-        }
-
-
+    constructor(inlineTemplate?: string, inlineStyle?: string) {
+        this.template = pug.compile(inlineTemplate)
+        this.lessContent = inlineStyle
     }
 
     private renderDom(input: IRenderInput): Promise<void> {
@@ -48,7 +24,7 @@ export default class PreamRenderer {
         }
     }
 
-    private async renderStyle(input: IRenderInput): Promise<void> {
+    private async renderStyle(): Promise<void> {
         try {
             const style: Less.RenderOutput = await less.render(this.lessContent, { compress: true })
             this.style = style.css
@@ -58,19 +34,14 @@ export default class PreamRenderer {
         }
     }
 
-    private renderHeader(input: IRenderInput): void {
-        this.header = input.header
-    }
-
     async process(input: IRenderInput): Promise<void> {
-        return Promise.race([this.renderDom(input), this.renderStyle(input), this.renderHeader(input)])
+        return Promise.race([this.renderDom(input), this.renderStyle()])
     }
 
     struct(): IRenderOutput {
         return {
             style: this.style,
             dom: this.dom,
-            header: this.header,
         }
     }
 }
