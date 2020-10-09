@@ -46,7 +46,6 @@ export default class PreamRenderer {
     }
 
     private async renderStyle(): Promise<void> {
-
         if (!this.inlineStyle) {
             return Promise.resolve()
         }
@@ -67,7 +66,7 @@ export default class PreamRenderer {
         }
     }
 
-    async process(input: IRenderInput): Promise<void> {
+    async process(input: IRenderInput = { content: null }): Promise<void> {
         return Promise.race([this.renderDom(input), this.renderStyle()])
     }
 

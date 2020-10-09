@@ -4,18 +4,29 @@ import { IRenderInput, IRenderOutput } from 'pream-types'
 
 describe('main.ts', function () {
     it('should render basic', async () => {
-        const r: Renderer = new Renderer('.content content', '.myclass{ color : white }')
-        const input: IRenderInput = {
-            content: 'content',
-            header: 'header',
-            iconClass: 'iconClass',
-        } as IRenderInput
+        const r: Renderer = new Renderer('.content #{content}', '.myclass{ color : white }')
+        const input: IRenderInput = { content: 'hi' }
 
         await r.process(input)
 
         const expected: IRenderOutput = {
             style: '.myclass{color:white}',
-            dom: '<div class="content">content</div>',
+            dom: '<div class="content">hi</div>',
+        }
+
+        const output: IRenderOutput = r.struct()
+
+        expect(output).to.eql(expected)
+    })
+
+    it('should render without content submitted', async () => {
+        const r: Renderer = new Renderer('.content', '.myclass{ color : white }')
+
+        await r.process()
+
+        const expected: IRenderOutput = {
+            style: '.myclass{color:white}',
+            dom: '<div class="content"></div>',
         }
 
         const output: IRenderOutput = r.struct()

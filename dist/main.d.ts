@@ -9,6 +9,6 @@ export default class PreamRenderer {
     constructor(inlineTemplate?: string, inlineStyle?: string, wrapperClass?: string);
     private renderDom;
     private renderStyle;
-    process(input: IRenderInput): Promise<void>;
+    process(input?: IRenderInput): Promise<void>;
     struct(): IRenderOutput;
 }

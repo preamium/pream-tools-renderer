@@ -111,6 +111,7 @@ var PreamRenderer = /** @class */ (function () {
         });
     };
     PreamRenderer.prototype.process = function (input) {
+        if (input === void 0) { input = { content: null }; }
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, Promise.race([this.renderDom(input), this.renderStyle()])];
