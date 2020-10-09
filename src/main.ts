@@ -1,5 +1,6 @@
 import * as pug from 'pug'
 import * as less from 'less'
+import PreamOneLiner, * as PreamOneLinerConstant from 'pream-oneliner'
 import { IRenderInput, IRenderOutput } from 'pream-types'
 
 export default class PreamRenderer {
@@ -8,16 +9,36 @@ export default class PreamRenderer {
 
     private style: string
     private dom: string
-    private lessContent: string
 
-    constructor(inlineTemplate?: string, inlineStyle?: string) {
-        this.template = pug.compile(inlineTemplate)
-        this.lessContent = inlineStyle
+    constructor(private inlineTemplate?: string, private inlineStyle?: string, private wrapperClass?: string) {
+
+        if (this.wrapperClass) {
+            const replacer: string = `${PreamOneLinerConstant.NEWLINE}${PreamOneLinerConstant.TAB}`
+
+            if (this.inlineTemplate) {
+                this.inlineTemplate = `.${this.wrapperClass}${PreamOneLinerConstant.NEWLINE}${this.inlineTemplate}`
+                this.inlineTemplate = `${this.inlineTemplate.replace(PreamOneLinerConstant.NEWLINE, replacer)}`
+            }
+
+            if (this.inlineStyle) {
+                this.inlineStyle = `div.${this.wrapperClass}{${this.inlineStyle}}`
+                this.inlineStyle = `${this.inlineStyle.replace(PreamOneLinerConstant.NEWLINE, replacer)}`
+            }
+        }
     }
 
-    private renderDom(input: IRenderInput): Promise<void> {
+    private async renderDom(input: IRenderInput): Promise<void> {
+        if (!this.inlineTemplate) {
+            return Promise.resolve()
+        }
+
         try {
-            this.dom = this.template({ content: input.content })
+            const domUnprocessor: string = await new PreamOneLiner(
+                this.inlineTemplate,
+                PreamOneLinerConstant.OneLinerType.PUG,
+                PreamOneLinerConstant.OneLinerDirection.UNPROCESS,
+            ).process()
+            this.dom = pug.render(domUnprocessor, { content: input.content })
             return Promise.resolve()
         } catch (e) {
             return Promise.reject(new Error(e))
@@ -25,11 +46,23 @@ export default class PreamRenderer {
     }
 
     private async renderStyle(): Promise<void> {
+
+        if (!this.inlineStyle) {
+            return Promise.resolve()
+        }
+
         try {
-            const style: Less.RenderOutput = await less.render(this.lessContent, { compress: true })
-            this.style = style.css
+            const styleUnprocessor: string = await new PreamOneLiner(
+                this.inlineStyle,
+                PreamOneLinerConstant.OneLinerType.LESS,
+                PreamOneLinerConstant.OneLinerDirection.UNPROCESS,
+            ).process()
+
+            const lessRenderer: Less.RenderOutput = await less.render(styleUnprocessor, { compress: true })
+            this.style = lessRenderer.css
             return Promise.resolve()
         } catch (e) {
+            console.error(e)
             return Promise.reject(new Error(e))
         }
     }

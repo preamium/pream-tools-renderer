@@ -38,36 +38,74 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var pug = require("pug");
 var less = require("less");
+var pream_oneliner_1 = require("pream-oneliner"), PreamOneLinerConstant = pream_oneliner_1;
 var PreamRenderer = /** @class */ (function () {
-    function PreamRenderer(inlineTemplate, inlineStyle) {
-        this.template = pug.compile(inlineTemplate);
-        this.lessContent = inlineStyle;
+    function PreamRenderer(inlineTemplate, inlineStyle, wrapperClass) {
+        this.inlineTemplate = inlineTemplate;
+        this.inlineStyle = inlineStyle;
+        this.wrapperClass = wrapperClass;
+        if (this.wrapperClass) {
+            var replacer = "" + PreamOneLinerConstant.NEWLINE + PreamOneLinerConstant.TAB;
+            if (this.inlineTemplate) {
+                this.inlineTemplate = "." + this.wrapperClass + PreamOneLinerConstant.NEWLINE + this.inlineTemplate;
+                this.inlineTemplate = "" + this.inlineTemplate.replace(PreamOneLinerConstant.NEWLINE, replacer);
+            }
+            if (this.inlineStyle) {
+                this.inlineStyle = "div." + this.wrapperClass + "{" + this.inlineStyle + "}";
+                this.inlineStyle = "" + this.inlineStyle.replace(PreamOneLinerConstant.NEWLINE, replacer);
+            }
+        }
     }
     PreamRenderer.prototype.renderDom = function (input) {
-        try {
-            this.dom = this.template({ content: input.content });
-            return Promise.resolve();
-        }
-        catch (e) {
-            return Promise.reject(new Error(e));
-        }
-    };
-    PreamRenderer.prototype.renderStyle = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var style, e_1;
+            var domUnprocessor, e_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, less.render(this.lessContent, { compress: true })];
+                        if (!this.inlineTemplate) {
+                            return [2 /*return*/, Promise.resolve()];
+                        }
+                        _a.label = 1;
                     case 1:
-                        style = _a.sent();
-                        this.style = style.css;
-                        return [2 /*return*/, Promise.resolve()];
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, new pream_oneliner_1.default(this.inlineTemplate, PreamOneLinerConstant.OneLinerType.PUG, PreamOneLinerConstant.OneLinerDirection.UNPROCESS).process()];
                     case 2:
+                        domUnprocessor = _a.sent();
+                        this.dom = pug.render(domUnprocessor, { content: input.content });
+                        return [2 /*return*/, Promise.resolve()];
+                    case 3:
                         e_1 = _a.sent();
                         return [2 /*return*/, Promise.reject(new Error(e_1))];
-                    case 3: return [2 /*return*/];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    PreamRenderer.prototype.renderStyle = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var styleUnprocessor, lessRenderer, e_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this.inlineStyle) {
+                            return [2 /*return*/, Promise.resolve()];
+                        }
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 4, , 5]);
+                        return [4 /*yield*/, new pream_oneliner_1.default(this.inlineStyle, PreamOneLinerConstant.OneLinerType.LESS, PreamOneLinerConstant.OneLinerDirection.UNPROCESS).process()];
+                    case 2:
+                        styleUnprocessor = _a.sent();
+                        return [4 /*yield*/, less.render(styleUnprocessor, { compress: true })];
+                    case 3:
+                        lessRenderer = _a.sent();
+                        this.style = lessRenderer.css;
+                        return [2 /*return*/, Promise.resolve()];
+                    case 4:
+                        e_2 = _a.sent();
+                        console.error(e_2);
+                        return [2 /*return*/, Promise.reject(new Error(e_2))];
+                    case 5: return [2 /*return*/];
                 }
             });
         });
