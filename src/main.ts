@@ -5,8 +5,6 @@ import { IRenderInput, IRenderOutput } from 'pream-types'
 
 export default class PreamRenderer {
 
-    private template: pug.compileTemplate
-
     private style: string
     private dom: string
 
@@ -17,12 +15,12 @@ export default class PreamRenderer {
 
             if (this.inlineTemplate) {
                 this.inlineTemplate = `.${this.wrapperClass}${PreamOneLinerConstant.NEWLINE}${this.inlineTemplate}`
-                this.inlineTemplate = `${this.inlineTemplate.replace(PreamOneLinerConstant.NEWLINE, replacer)}`
+                this.inlineTemplate = `${this.inlineTemplate.replace(new RegExp(PreamOneLinerConstant.NEWLINE, 'gi'), replacer)}`
             }
 
             if (this.inlineStyle) {
                 this.inlineStyle = `div.${this.wrapperClass}{${this.inlineStyle}}`
-                this.inlineStyle = `${this.inlineStyle.replace(PreamOneLinerConstant.NEWLINE, replacer)}`
+                this.inlineStyle = `${this.inlineStyle.replace(new RegExp(PreamOneLinerConstant.NEWLINE, 'gi'), replacer)}`
             }
         }
     }
@@ -38,6 +36,7 @@ export default class PreamRenderer {
                 PreamOneLinerConstant.OneLinerType.PUG,
                 PreamOneLinerConstant.OneLinerDirection.UNPROCESS,
             ).process()
+
             this.dom = pug.render(domUnprocessor, { content: input.content })
             return Promise.resolve()
         } catch (e) {
@@ -61,13 +60,18 @@ export default class PreamRenderer {
             this.style = lessRenderer.css
             return Promise.resolve()
         } catch (e) {
-            console.error(e)
             return Promise.reject(new Error(e))
         }
     }
 
     async process(input: IRenderInput = { content: null }): Promise<void> {
-        return Promise.race([this.renderDom(input), this.renderStyle()])
+        return Promise.all([this.renderDom(input), this.renderStyle()])
+            .then(() => {
+                return Promise.resolve()
+            })
+            .catch((e: Error) => {
+                return Promise.reject(e)
+            })
     }
 
     struct(): IRenderOutput {

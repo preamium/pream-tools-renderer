@@ -41,7 +41,7 @@ describe('main.ts', function () {
         await r.process(input)
 
         const expected: IRenderOutput = {
-            dom: '<div class="wrapper"><div class="clock-container"></div><div class="time">content</div><div class="loc">header</div></div>',
+            dom: '<div class="wrapper"><div class="clock-container"><div class="time">content</div><div class="loc">header</div></div></div>',
             style: undefined,
         }
 
@@ -64,5 +64,28 @@ describe('main.ts', function () {
         const output: IRenderOutput = r.struct()
 
         expect(output).to.eql(expected)
+    })
+
+    it('should not process if template is not valid', async () => {
+        const r: Renderer = new Renderer('.clock-container#N##T##T#.time content#N##T#.loc header', null)
+        const input: IRenderInput = { content: 'content' }
+
+        try {
+            await r.process(input)
+        } catch (e) {
+            expect(e).to.be.an.instanceOf(Error)
+            expect(e.message).to.contain('Inconsistent indentation. Expecting either 0 or 8 spaces/tabs.')
+        }
+    })
+
+    it('should not process if style is not valid', async () => {
+        const r: Renderer = new Renderer(null, '{dummy}')
+
+        try {
+            await r.process()
+        } catch (e) {
+            expect(e).to.be.an.instanceOf(Error)
+            expect(e.message).to.contain('ParseError: Unrecognised input')
+        }
     })
 })
