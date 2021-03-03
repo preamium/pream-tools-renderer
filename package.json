@@ -13,7 +13,7 @@
         "glob": "^5.0.14",
         "less": "^3.11.1",
         "pream-oneliner": "^1.4.0",
-        "pug": "^2.0.3"
+        "pug": "^3.0.1"
     },
     "devDependencies": {
         "@types/chai": "^4.2.12",
